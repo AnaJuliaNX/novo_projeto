@@ -1,11 +1,11 @@
-package main
+package rota
 
 import (
 	"encoding/json"
 	"net/http"
 )
 
-type DadosPost struct {
+type Post struct {
 	Id     int    `json:"id"`
 	Titulo string `json:"titulo"`
 	Texto  string `json:"texto"`
@@ -13,12 +13,12 @@ type DadosPost struct {
 
 // Slice of Post
 var (
-	posts []DadosPost
+	posts []Post
 )
 
 // Dados que vou usar no metodo Post da minha rota
 func init() {
-	posts = []DadosPost{{Id: 1, Titulo: "Titulo 1", Texto: "Texto 1"}}
+	posts = []Post{{Id: 1, Titulo: "Titulo 1", Texto: "Texto 1"}}
 }
 
 // Função para ver os dados
@@ -38,7 +38,23 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	w.Write(resultado)
 }
 
-// Função para adicionar mais
-func addPos(w http.ResponseWriter, r *http.Request) {
-	json.NewDecoder(r.Body)
+// Função para adicionar mais um por vez
+func AddPos(w http.ResponseWriter, r *http.Request) {
+	//Não sei qual está sendoa  finalidade visto que executa perfeitamnete sem
+	w.Header().Set("", "application/json")
+	var post Post
+	//Uso o Decoder quando quero "ler" um valor e escrever esse valor em uma variavel de qualquer tipo
+	erro := json.NewDecoder(r.Body).Decode(&post)
+	if erro != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte(`{"error": "Erro ao fazer o unmarshal}`))
+	}
+	post.Id = len(posts) + 1
+	posts = append(posts, post)
+
+	//w.WriteHeader(http.StatusOK)
+
+	resultado, erro := json.Marshal(post)
+	w.Write(resultado)
+
 }
