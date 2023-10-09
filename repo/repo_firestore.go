@@ -71,5 +71,6 @@ func (*repo) Encontrados() ([]tipos.Post, error) {
 		}
 		posts = append(posts, post)
 	}
-	return posts, nil
+	//Verificar e arrumar isso depois, ta dizendo que é inutilizavél
+	// return posts, nil
 }

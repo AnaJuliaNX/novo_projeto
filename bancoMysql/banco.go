@@ -1,10 +1,12 @@
-package repo
+package bancomysql
 
 import (
 	"database/sql"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
-// Caso decida usar o banco de dados que eu mesma criei no meu pc aqui está todo o processo de conexão com ele
+// Testando se consigo faser funcionar com um banco mysql
 func ConectarNoBanco() (*sql.DB, error) {
 	stringDeConexao := "func:funcionario@/pragmatica_livraria?charset=utf8&parseTime=True&loc=Local"
 
