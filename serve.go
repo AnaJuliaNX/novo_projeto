@@ -19,10 +19,11 @@ func main() {
 	})
 	//ROTAS DO CURSO
 	router.HandleFunc("/postados", rota.GetPosts).Methods("GET")
-	router.HandleFunc("/postados", rota.AddPos).Methods("POST")
+	router.HandleFunc("/postados", rota.AddPost).Methods("POST")
 
 	//ROTAS MYSQL
 	router.HandleFunc("/livros", repo.AddBook).Methods("POST")
+	router.HandleFunc("/livros", repo.ShowAllBooks).Methods("GET")
 
 	log.Println("Executando na porta", port)
 	log.Fatalln(http.ListenAndServe(port, router))

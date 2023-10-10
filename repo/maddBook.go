@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	bancomysql "github.com/AnaJuliaNX/novo_projeto/bancoMysql"
+	mysqlBanco "github.com/AnaJuliaNX/novo_projeto/mysqlBanco"
 )
 
 // Meu jeito padrão usando mysql, posso tentar fazer alumas mudanças depois pra não ficar gigante
@@ -34,7 +34,7 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	db, erro := bancomysql.ConectarNoBanco()
+	db, erro := mysqlBanco.ConectarNoBanco()
 	if erro != nil {
 		log.Fatalf("Erro ao fazer a conexão com o banco %v", erro)
 		return

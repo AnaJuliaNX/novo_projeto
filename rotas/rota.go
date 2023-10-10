@@ -11,13 +11,13 @@ import (
 
 // Slice of Post
 var (
-	reposi repo.PostRepositorio = repo.NewPostRepo()
+	reposi repo.PostRepositorio = repo.NewFirestoreRepo()
 )
 
 // Função para ver os dados
 func GetPosts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
-	posts, erro := repo.NewPostRepo().Encontrados()
+	posts, erro := repo.NewFirestoreRepo().Encontrados()
 	if erro != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte(`{"error": "Erro ao obter os dados dos livros"}`))
@@ -28,8 +28,8 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 }
 
 // Função para adicionar mais um por vez
-func AddPos(w http.ResponseWriter, r *http.Request) {
-	//Não sei qual está sendoa  finalidade visto que executa perfeitamnete sem
+func AddPost(w http.ResponseWriter, r *http.Request) {
+	//A finalidade disso é porque
 	w.Header().Set("content-type", "application/json")
 	var post tipos.Post
 	//Uso o Decoder quando quero "ler" um valor e escrever esse valor em uma variavel de qualquer tipo
@@ -39,7 +39,7 @@ func AddPos(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(`{"error": "Erro ao fazer o unmarshal"}`))
 	}
 	post.ID = rand.Int63() //Para gerar ID's aleatórios
-	repo.NewPostRepo().Save(&post)
+	repo.NewFirestoreRepo().Save(&post)
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(post)
 }

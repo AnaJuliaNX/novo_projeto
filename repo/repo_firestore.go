@@ -10,7 +10,7 @@ import (
 
 type repo struct{}
 
-func NewPostRepo() PostRepositorio {
+func NewFirestoreRepo() PostRepositorio {
 	return &repo{}
 }
 
@@ -46,7 +46,7 @@ func (r *repo) Save(post *tipos.Post) (*tipos.Post, error) {
 }
 
 // Função para exibir todos os livros cadastrados
-func (*repo) Encontrados() ([]tipos.Post, error) {
+func (r *repo) Encontrados() ([]tipos.Post, error) {
 	ctx := context.Background()
 	livro, erro := firestore.NewClient(ctx, IdDoProjeto)
 	if erro != nil {
@@ -66,7 +66,7 @@ func (*repo) Encontrados() ([]tipos.Post, error) {
 		}
 		post := tipos.Post{
 			ID:     documento.Data()["ID"].(int64),      //identifica que nesse campo precisa ser um int
-			Titulo: documento.Data()["Titulo"].(string), //identificxa que nesse campo precisa ser uma string
+			Titulo: documento.Data()["Titulo"].(string), //identifica que nesse campo precisa ser uma string
 			Autor:  documento.Data()["Autor"].(string),  //identifica que nesse campo precisa ser uma string
 		}
 		posts = append(posts, post)
