@@ -9,9 +9,9 @@ import (
 )
 
 type PostService interface {
-	Validacao(post *tipos.Post) error
-	Criar(post *tipos.Post) (*tipos.Post, error)
-	AcharTodos() ([]tipos.Post, error)
+	Validacao(post *tipos.Post) error            //Para fazer a validação dos dados
+	Criar(post *tipos.Post) (*tipos.Post, error) //Para criar dados
+	AcharTodos() ([]tipos.Post, error)           //Para buscar dados previamente cadastrados
 }
 
 type service struct{}
@@ -22,10 +22,12 @@ func NewPostService() PostService {
 
 // Fazendo a validação dos dados digitados
 func (*service) Validacao(post *tipos.Post) error {
+	//verificando se não foi enviado vazio
 	if post == nil {
 		erro := errors.New("O post não pode ser vazio")
 		return erro
 	}
+	//Verificando se os campos não estão vazios
 	if post.Titulo == "" || post.Autor == "" {
 		erro := errors.New("O campo titulo não pode estar vazio")
 		return erro

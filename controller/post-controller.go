@@ -12,7 +12,19 @@ var (
 	postService service.PostService = service.NewPostService()
 )
 
-func GetPosts(w http.ResponseWriter, r *http.Request) {
+type PostController interface {
+	GetAllBooks(w http.ResponseWriter, r *http.Request)
+	AddBooks(w http.ResponseWriter, r *http.Request)
+}
+
+type controller struct{}
+
+func NewPostController() PostController {
+	return &controller{}
+}
+
+// Função para buscar os livros cadastrados
+func (*controller) GetAllBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	posts, erro := postService.AcharTodos()
 	if erro != nil {
@@ -26,7 +38,8 @@ func GetPosts(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(posts)
 }
 
-func AddPost(w http.ResponseWriter, r *http.Request) {
+// Função para adicionar livros novos
+func (*controller) AddBooks(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-type", "application/json")
 	var post tipos.Post
 	erro := json.NewDecoder(r.Body).Decode(&post)
@@ -48,6 +61,7 @@ func AddPost(w http.ResponseWriter, r *http.Request) {
 	resultado, erro2 := postService.Criar(&post)
 	if erro2 != nil {
 		w.WriteHeader(http.StatusInternalServerError)
+		//Mensagem de erro personalizada
 		json.NewEncoder(w).Encode(tipos.ServiceError{Message: "Erro ao salvar os dados"})
 		return
 	}

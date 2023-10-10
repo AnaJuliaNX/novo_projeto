@@ -2,29 +2,33 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 
+	"github.com/AnaJuliaNX/novo_projeto/controller"
+	router "github.com/AnaJuliaNX/novo_projeto/controller/http"
 	repo "github.com/AnaJuliaNX/novo_projeto/repo"
-	rota "github.com/AnaJuliaNX/novo_projeto/rotas"
-	"github.com/gorilla/mux"
+)
+
+// Desse jeito estaremos livres da solicitação http pra usar tanto a bibliteca CHI quanto a MUX
+var (
+	postController controller.PostController = controller.NewPostController()
+	httpRouter     router.Router             = router.NewChiRouter()
 )
 
 func main() {
 	//Subindo o servidor
-	router := mux.NewRouter()
 	const port string = ":9000"
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Funcionando") //Vou exibir essa mensagem pro usuário
+
+	httpRouter.GET("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, "Funcionando") //Vou exibir aó essa mensagem no postman quando sobre o server
 	})
 	//ROTAS DO CURSO
-	router.HandleFunc("/postados", rota.GetPosts).Methods("GET")
-	router.HandleFunc("/postados", rota.AddPost).Methods("POST")
+	httpRouter.GET("/postados", postController.GetAllBooks) //rota para buscar os livros no FIRESTORE
+	httpRouter.POST("/postados", postController.AddBooks)   //rota para adicionar os livros
 
 	//ROTAS MYSQL
-	router.HandleFunc("/livros", repo.AddBook).Methods("POST")
-	router.HandleFunc("/livros", repo.ShowAllBooks).Methods("GET")
+	httpRouter.POST("/livros", repo.AddBook) //rota para adicionar livros no MYSQL
+	httpRouter.GET("/livros", repo.ShowAllBooks)
 
-	log.Println("Executando na porta", port)
-	log.Fatalln(http.ListenAndServe(port, router))
+	httpRouter.SERVE(port)
 }
