@@ -16,7 +16,11 @@ type PostService interface {
 
 type service struct{}
 
-func NewPostService() PostService {
+var (
+	repos repo.PostRepositorio
+)
+
+func NewPostService(repo repo.PostRepositorio) PostService {
 	return &service{}
 }
 
@@ -28,8 +32,12 @@ func (*service) Validacao(post *tipos.Post) error {
 		return erro
 	}
 	//Verificando se os campos não estão vazios
-	if post.Titulo == "" || post.Autor == "" {
+	if post.Titulo == "" {
 		erro := errors.New("O campo titulo não pode estar vazio")
+		return erro
+	}
+	if post.Autor == "" {
+		erro := errors.New("O campo autor não pode estar vazio")
 		return erro
 	}
 	return nil
