@@ -7,12 +7,19 @@ import (
 	"github.com/AnaJuliaNX/novo_projeto/controller"
 	router "github.com/AnaJuliaNX/novo_projeto/controller/http"
 	repo "github.com/AnaJuliaNX/novo_projeto/repo"
+	"github.com/AnaJuliaNX/novo_projeto/service"
 )
 
-// Desse jeito estaremos livres da solicitação http pra usar tanto a bibliteca CHI quanto a MUX
+// Desse jeito estaremos:
 var (
-	postController controller.PostController = controller.NewPostController()
-	httpRouter     router.Router             = router.NewChiRouter()
+	postRepositorio repo.PostRepositorio = repo.NewFirestoreRepo()
+	//Independetes de estruturas
+	postService service.PostService = service.NewPostService(postRepositorio)
+	//Que é independente de Banco de dados
+	postController controller.PostController = controller.NewPostController(postService)
+	//Que é independete de UI (user interface)
+	//Ou seja, posso trocar tanto pra uma chi router quanto pra um mux router
+	httpRouter router.Router = router.NewMuxRouter()
 )
 
 func main() {
@@ -28,7 +35,7 @@ func main() {
 
 	//ROTAS MYSQL
 	httpRouter.POST("/livros", repo.AddBook) //rota para adicionar livros no MYSQL
-	httpRouter.GET("/livros", repo.ShowAllBooks)
+	httpRouter.GET("/livros", repo.GetAllBooks)
 
 	httpRouter.SERVE(port)
 }

@@ -8,14 +8,14 @@ import (
 	"github.com/AnaJuliaNX/novo_projeto/tipos"
 )
 
-type repo struct{}
+type repos struct{}
 
 func NewFirestoreRepo() PostRepositorio {
 	return &repo{}
 }
 
 const (
-	IdDoProjeto = "novo-projeto"
+	IdDoProjeto = "novo-projeto-3ee53"
 	NomeColecao = "postados"
 )
 

@@ -10,7 +10,7 @@ import (
 )
 
 // Função para selecionar e exibir todos os livros cadastrados, somente o básico
-func ShowAllBooks(w http.ResponseWriter, r *http.Request) {
+func getAllBooks(w http.ResponseWriter, r *http.Request) {
 
 	//Abre a conexão com banco de dados
 	db, erro := mysqlBanco.ConectarNoBanco()
