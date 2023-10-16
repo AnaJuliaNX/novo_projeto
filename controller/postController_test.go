@@ -2,6 +2,7 @@ package controller
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -14,48 +15,80 @@ import (
 )
 
 const (
+	ID     int64  = 123
 	TITULO string = "1984"
 	AUTOR  string = "George Orwell"
 )
 
 var (
-	postRepo       repo.PostRepositorio = repo.NewMysqlRepo()
+	//Posso usar tanto o banco Mysql quanto o Firestore. "NewMysqlRepo"
+	postRepo       repo.PostRepositorio = repo.NewFirestoreRepo()
 	postSrv        service.PostService  = service.NewPostService(postRepo)
 	postController PostController       = NewPostController(postSrv)
 )
 
 func TestAddBook(t *testing.T) {
+	//Inserir um novo post
+	inserir()
 
 	//Criar uma nova solicitação HTTP POST
 	json := []byte(`{"titulo": "` + TITULO + `","autor": "` + AUTOR + `"}`)
 	solicitacao, _ := http.NewRequest("POST", "/livros", bytes.NewBuffer(json))
-	//Assign HTTP HandleFunc (controller função AddPost)
+	//Atribuindo HTTP HandleFunc (controller função AddPost)
 	handler := http.HandlerFunc(postController.AddBooks)
 	//Registrar a resposta HTTP
 	resposta := httptest.NewRecorder() //gravador de resposta
 	//"Despachar" a solicitação HTTP
 	handler.ServeHTTP(resposta, solicitacao)
-	//Adicionar asserções no codigo de status HTTP e na resposta
+	//Adicionar asserções no código de status HTTP e na resposta
+	status := resposta.Code
+	if status != http.StatusOK {
+		t.Errorf("retorno incorreto do handler: got %v want %v", status, http.StatusOK)
+	}
+	//Decode da resposta do HTTP
+	var post tipos.Post
+	//json.NewDecoder(io.Reader(resposta.Body)).Decode(&post)
+	//Assert na resposta HTTP
+	assert.NotNil(t, post.ID)
+	assert.Equal(t, TITULO, post.Titulo)
+	assert.Equal(t, AUTOR, post.Autor)
+
+	//Limpo os dados porque quando estou testando acabo criando um novo e como não quero ele deleto
+	cleanUp(&post)
+}
+
+func TestGetBooks(t *testing.T) {
+	//criar uma nova solicitação
+	solicitacao, _ := http.NewRequest("GET", "/livros", nil)
+	//Atribuindo HTTP HandleFunc (controller função AddPost)
+	handler := http.HandlerFunc(postController.GetAllBooks)
+	//Registrar a resposta HTTP
+	resposta := httptest.NewRecorder() //gravador de resposta
+	//"Despachar" a solicitação HTTP
+	handler.ServeHTTP(resposta, solicitacao)
+	//Adicionar asserções no código de status HTTP e na resposta
 	status := resposta.Code
 	if status != http.StatusOK {
 		t.Errorf("retorno incorreto do handler: got %v want %v", status, http.StatusOK)
 	}
 
 	//Decode da resposta do HTTP
-	var post tipos.Post
-	json.NewDecoder(io.Reader(resposta.Body)).Decode(&post) //Erro no decoder que será corrigido logo mais
-	//Assert na resposta HTTP
-	assert.NotNil(t, post.ID)
-	assert.Equal(t, TITULO, post.Titulo)
-	assert.Equal(t, AUTOR, post.Autor)
+	var posts []tipos.Post
+	json.NewDecoder(io.Reader(resposta.Body)).Decode(&posts)
+	assert.NotNil(t, posts[0].ID)
+	assert.Equal(t, TITULO, posts[0].Titulo)
 
-	//Limpar banco de dados, para limpar todo os dados do teste feito
-	//Limpo os dados porque quando estou testando acabo criando um novo e coomo não quero ele deleto
-	cleanUp(&post)
+	//cleanUp(&posts[0])
 }
 
-func TestGetBooks(t *testing.T) {
-
+// Função para inserir um novo livro no banco de dados
+func inserir() {
+	var post tipos.Post = tipos.Post{
+		ID:     ID,
+		Titulo: TITULO,
+		Autor:  AUTOR,
+	}
+	repo.NewFirestoreRepo().Save(&post)
 }
 
 // Não criei o delete no mysql nem no firestore então será apenas de exemplo

@@ -3,6 +3,7 @@ package repo
 import (
 	"context"
 	"log"
+	"strconv"
 
 	"cloud.google.com/go/firestore"
 	"github.com/AnaJuliaNX/novo_projeto/tipos"
@@ -71,4 +72,28 @@ func (r *repo) Encontrados() ([]tipos.Post, error) {
 		}
 		posts = append(posts, post)
 	}
+}
+
+func (r *repo) Delete(post *tipos.Post) error {
+	ctx := context.Background()
+
+	// Inicializando o cliente no firestore
+	livro, erro := firestore.NewClient(ctx, IdDoProjeto)
+	if erro != nil {
+		log.Fatalf("Erro ao criar o cliente Firestore: %v", erro)
+		return erro
+	}
+	defer livro.Close()
+
+	// Criando uma referência ao livro que desejo excluir
+	referencia := livro.Collection(NomeColecao).Doc(strconv.Itoa(int(post.ID)))
+
+	// Deletando o documento
+	_, erro = referencia.Delete(ctx)
+	if erro != nil {
+		log.Fatalf("Falha ao deletar o documento: %v", erro)
+		return erro
+	}
+	//Se deu tudo certo não retorno nada
+	return nil
 }

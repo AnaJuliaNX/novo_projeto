@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	service "github.com/AnaJuliaNX/novo_projeto/service"
 	"github.com/AnaJuliaNX/novo_projeto/tipos"
@@ -68,4 +69,21 @@ func (*controller) AddBooks(w http.ResponseWriter, r *http.Request) {
 	}
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(resultado)
+}
+
+func (*controller) Delete(w http.ResponseWriter, r *http.Request) {
+	id := r.URL.Query().Get("id")
+	idInt, erro := strconv.Atoi(id)
+	if erro != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(tipos.ServiceError{Message: erro.Error()})
+	}
+	erro = postService.Delete(idInt)
+	if erro != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(tipos.ServiceError{Message: erro.Error()})
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode("Deletado com sucesso")
 }

@@ -9,6 +9,7 @@ import (
 )
 
 // Outra forma de testar as partes do meu código
+// Os testes só não funcionam porque esse código não está vinculado com o banco firestore
 type MockRepositorio struct {
 	mock.Mock
 }
@@ -22,6 +23,10 @@ func (mock *MockRepositorio) Encontrados() ([]tipos.Post, error) {
 	argumentos := mock.Called()
 	resultado := argumentos.Get(0)
 	return resultado.([]tipos.Post), argumentos.Error(1)
+}
+
+func (mock *MockRepositorio) Delete(post *tipos.Post) error {
+	return nil
 }
 
 func TestEncontrados(t *testing.T) {

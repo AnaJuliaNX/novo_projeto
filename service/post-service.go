@@ -12,6 +12,7 @@ type PostService interface {
 	Validacao(post *tipos.Post) error            //Para fazer a validação dos dados
 	Criar(post *tipos.Post) (*tipos.Post, error) //Para criar dados
 	AcharTodos() ([]tipos.Post, error)           //Para buscar dados previamente cadastrados
+	Delete(id int) error
 }
 
 type service struct{}
@@ -52,4 +53,8 @@ func (*service) Criar(post *tipos.Post) (*tipos.Post, error) {
 // Função para encontrar
 func (*service) AcharTodos() ([]tipos.Post, error) {
 	return repo.NewFirestoreRepo().Encontrados()
+}
+
+func (*service) Delete(id int) error {
+	return repo.NewFirestoreRepo().Delete(&tipos.Post{})
 }

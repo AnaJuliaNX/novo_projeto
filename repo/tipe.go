@@ -7,4 +7,5 @@ import (
 type PostRepositorio interface {
 	Save(post *tipos.Post) (*tipos.Post, error)
 	Encontrados() ([]tipos.Post, error)
+	Delete(post *tipos.Post) error
 }

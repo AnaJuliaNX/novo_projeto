@@ -12,7 +12,7 @@ import (
 
 // Desse jeito estaremos:
 var (
-	postRepositorio repo.PostRepositorio = repo.NewFirestoreRepo()
+	postRepositorio repo.PostRepositorio = repo.NewMysqlRepo()
 	//Independetes de estruturas
 	postService service.PostService = service.NewPostService(postRepositorio)
 	//Que é independente de Banco de dados
@@ -23,11 +23,11 @@ var (
 )
 
 func main() {
-	//Subindo o servidor
+
 	const port string = ":9000"
 
 	httpRouter.GET("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, "Funcionando") //Vou exibir aó essa mensagem no postman quando sobre o server
+		fmt.Fprintln(w, "Funcionando")
 	})
 	//ROTAS DO CURSO
 	httpRouter.GET("/postados", postController.GetAllBooks) //rota para buscar os livros no FIRESTORE
@@ -36,6 +36,8 @@ func main() {
 	//ROTAS MYSQL
 	httpRouter.POST("/livros", repo.AddBook) //rota para adicionar livros no MYSQL
 	httpRouter.GET("/livros", repo.GetAllBooks)
+	httpRouter.DELETE("/livros/{id}", repo.Delete)
 
+	//httpRouter.SERVE(os.Getenv("PORTA"))
 	httpRouter.SERVE(port)
 }

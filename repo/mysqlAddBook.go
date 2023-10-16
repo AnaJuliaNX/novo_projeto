@@ -5,9 +5,11 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 
 	mysqlBanco "github.com/AnaJuliaNX/novo_projeto/mysqlBanco"
 	"github.com/AnaJuliaNX/novo_projeto/tipos"
+	"github.com/gorilla/mux"
 )
 
 type repo struct{}
@@ -68,7 +70,6 @@ func AddBook(w http.ResponseWriter, r *http.Request) {
 
 // Função para selecionar e exibir todos os livros cadastrados, somente o básico
 func GetAllBooks(w http.ResponseWriter, r *http.Request) {
-
 	//Abre a conexão com banco de dados
 	db, erro := mysqlBanco.ConectarNoBanco()
 	if erro != nil {
@@ -101,6 +102,37 @@ func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 	erro = json.NewEncoder(w).Encode(livros)
 	if erro != nil {
 		log.Fatalf("Erro ao converter para json: %v", erro)
+		return
+	}
+}
+
+func Delete(w http.ResponseWriter, r *http.Request) {
+	parametros := mux.Vars(r)
+	//Converto o parametro de string para int
+	ID, erro := strconv.ParseUint(parametros["id"], 10, 32)
+	if erro != nil {
+		log.Fatalf("Erro ao converter o parametropara inteiro: %v", erro)
+		return
+	}
+	//Executo o comando que faz a conexão com o banco (mais informações no arquivo "comandosBancoErro")
+	db, erro := mysqlBanco.ConectarNoBanco()
+	if erro != nil {
+		log.Fatalf("Erro ao fazer a conexão com o banco de dados: %v", erro)
+		return
+	}
+	defer db.Close()
+
+	//Crio o statement que vai excluir o livro especificado pelo Id
+	statement, erro := db.Prepare("delete from livros_postadas where id = ?")
+	if erro != nil {
+		log.Fatalf("Erro ao criar o statement: %v", erro)
+		return
+	}
+	defer statement.Close()
+	//Executo o statement e excluo o livro
+	_, erro = statement.Exec(ID)
+	if erro != nil {
+		log.Fatalf("Erro ao executar o statement: %v", erro)
 		return
 	}
 }
