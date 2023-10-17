@@ -74,7 +74,7 @@ func (r *repo) Encontrados() ([]tipos.Post, error) {
 	}
 }
 
-func (r *repo) Delete(post *tipos.Post) error {
+func (r *repo) Delete(ID int64) error {
 	ctx := context.Background()
 
 	// Inicializando o cliente no firestore
@@ -86,7 +86,7 @@ func (r *repo) Delete(post *tipos.Post) error {
 	defer livro.Close()
 
 	// Criando uma referência ao livro que desejo excluir
-	referencia := livro.Collection(NomeColecao).Doc(strconv.Itoa(int(post.ID)))
+	referencia := livro.Collection(NomeColecao).Doc(strconv.Itoa(int(ID)))
 
 	// Deletando o documento
 	_, erro = referencia.Delete(ctx)

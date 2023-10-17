@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/AnaJuliaNX/novo_projeto/tipos"
@@ -25,8 +26,13 @@ func (mock *MockRepositorio) Encontrados() ([]tipos.Post, error) {
 	return resultado.([]tipos.Post), argumentos.Error(1)
 }
 
-func (mock *MockRepositorio) Delete(post *tipos.Post) error {
+func (mock *MockRepositorio) Delete(ID int64) error {
 	return nil
+}
+
+func (mock *MockRepositorio) EncontrarPeloID(ID int64) (*tipos.Post, error) {
+	_, erro := fmt.Println("Apenas para não deixar vazio")
+	return nil, erro
 }
 
 func TestEncontrados(t *testing.T) {

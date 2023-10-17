@@ -106,12 +106,35 @@ func GetAllBooks(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Buscando um livro pelo ID
+func GetBookByID(w http.ResponseWriter, r *http.Request) {
+	//Convertendo o parametro da rota de string para int
+	parametros := mux.Vars(r)
+	ID, erro := strconv.ParseInt(parametros["id"], 10, 32)
+	if erro != nil {
+		log.Fatalf("Erro ao converter o parametro para inteiro: %v", erro)
+		return
+	}
+	//Buscando um livro com esse ID
+	livroencontrado, erro := mysqlBanco.BuscandoUMLivro(int(ID))
+	if erro != nil {
+		log.Fatalf("Erro ao buscar o livro pelo ID: %v", erro)
+		return
+	}
+	//Convertendo de struct para json
+	erro = json.NewEncoder(w).Encode(livroencontrado)
+	if erro != nil {
+		log.Fatalf("Erro ao converter para json: %v", erro)
+		return
+	}
+}
+
 func Delete(w http.ResponseWriter, r *http.Request) {
 	parametros := mux.Vars(r)
 	//Converto o parametro de string para int
 	ID, erro := strconv.ParseUint(parametros["id"], 10, 32)
 	if erro != nil {
-		log.Fatalf("Erro ao converter o parametropara inteiro: %v", erro)
+		log.Fatalf("Erro ao converter o parametro para inteiro: %v", erro)
 		return
 	}
 	//Executo o comando que faz a conexão com o banco (mais informações no arquivo "comandosBancoErro")

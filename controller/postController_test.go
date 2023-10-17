@@ -8,6 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/AnaJuliaNX/novo_projeto/cache"
 	"github.com/AnaJuliaNX/novo_projeto/repo"
 	service "github.com/AnaJuliaNX/novo_projeto/service"
 	"github.com/AnaJuliaNX/novo_projeto/tipos"
@@ -24,7 +25,8 @@ var (
 	//Posso usar tanto o banco Mysql quanto o Firestore. "NewMysqlRepo"
 	postRepo       repo.PostRepositorio = repo.NewFirestoreRepo()
 	postSrv        service.PostService  = service.NewPostService(postRepo)
-	postController PostController       = NewPostController(postSrv)
+	PostCacheServe cache.PostCache      = cache.NewRedisCache("localhost: 6379", 0, 10)
+	postController PostController       = NewPostController(postSrv, PostCacheServe)
 )
 
 func TestAddBook(t *testing.T) {
@@ -93,5 +95,36 @@ func inserir() {
 
 // Não criei o delete no mysql nem no firestore então será apenas de exemplo
 func cleanUp(post *tipos.Post) {
-	postRepo.Delete(post)
+	postRepo.Delete(ID)
 }
+
+/*
+ FUNÇÃO PARA BUSCAR UM LIVRO PELO ID COM O BANCO REDIS
+func TestGetBookByID(t *testing.T) {
+//Inserir um novo livro (não foi criada, apenas de exemplo)
+	setup()
+//Criando uma nova requisição HTTP, usando na rota o ID do livro especifico
+	requisicao, _ := http.NewRequest("GET", "/livros/"+strconv.FormatInt(ID, 10), nil)
+//Atribuindo HTTP HandleFunc (controller função AddPost)
+	handler := http.HandlerFunc(postController.GetBooksByID)
+//Registra a resposta do HTTP
+	resposta := httptest.NewRecorder()
+	handler.ServeHTTP(resposta, requisicao)
+//Conferindo o status do http e trato se for um erro
+	status := resposta.Code
+	if status != http.StatusOK {
+		t.Errorf("Retorno errado do código de status do handler: got %v want %v", status, http.StatusOK)
+	}
+
+//Decode HTTP status
+	var livro tipos.Post
+	json.NewDecoder(io.Reader(r.Body)).Decode(&livro)
+
+	assert.Equal(t, ID, livro.ID)
+	assert.Equal(t, TITULO, livro.Titulo)
+	assert.Equal(t, AUTOR, livro.Autor)
+
+//Limpando os dados do banco de dados
+	cleanUp(ID)
+}
+*/
