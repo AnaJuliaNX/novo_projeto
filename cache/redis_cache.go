@@ -10,8 +10,8 @@ import (
 
 type redisCache struct {
 	host     string
-	db       int
-	exipirar time.Duration //Definimos o tempo que o elemento ficará disponivel
+	db       int           //banco de dados
+	exipirar time.Duration //Define o tempo que o elemento ficará disponivel
 }
 
 func NewRedisCache(host string, db int, expi time.Duration) PostCache {
@@ -30,7 +30,6 @@ func (cache *redisCache) GetClientRedis() *redis.Client {
 		Password: "", //Sem senha por isso aspas vazias
 		DB:       cache.db,
 	})
-
 }
 
 // Associando o json post a key
@@ -47,6 +46,7 @@ func (cache *redisCache) Set(key string, value *tipos.Post) {
 	cliente.Set(key, json, cache.exipirar*time.Second)
 }
 
+// Função para buscar cliente com uma chave de identificação
 func (cache *redisCache) Get(key string) *tipos.Post {
 	cliente := cache.GetClientRedis()
 

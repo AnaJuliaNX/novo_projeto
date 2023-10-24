@@ -8,8 +8,10 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	bancomysql "github.com/AnaJuliaNX/novo_projeto/banco/mysql"
 	"github.com/AnaJuliaNX/novo_projeto/cache"
 	"github.com/AnaJuliaNX/novo_projeto/repo"
+	repomysql "github.com/AnaJuliaNX/novo_projeto/repo/mysql"
 	service "github.com/AnaJuliaNX/novo_projeto/service"
 	"github.com/AnaJuliaNX/novo_projeto/tipos"
 	"github.com/stretchr/testify/assert"
@@ -22,11 +24,12 @@ const (
 )
 
 var (
+	db = &bancomysql.DB{}
 	//Posso usar tanto o banco Mysql quanto o Firestore. "NewMysqlRepo"
-	postRepo       repo.PostRepositorio = repo.NewFirestoreRepo()
-	postSrv        service.PostService  = service.NewPostService(postRepo)
-	PostCacheServe cache.PostCache      = cache.NewRedisCache("localhost: 6379", 0, 10)
-	postController PostController       = NewPostController(postSrv, PostCacheServe)
+	postRepositorio repo.PostRepositorio = repomysql.NewMysqlRepo(db)
+	postSrv         service.PostService  = service.NewPostService(postRepositorio)
+	PostCacheServe  cache.PostCache      = cache.NewRedisCache("localhost: 6379", 0, 10)
+	postController  PostController       = NewPostController(postSrv, PostCacheServe)
 )
 
 func TestAddBook(t *testing.T) {
@@ -90,12 +93,12 @@ func inserir() {
 		Titulo: TITULO,
 		Autor:  AUTOR,
 	}
-	repo.NewFirestoreRepo().Save(&post)
+	repomysql.NewMysqlRepo(db).Save(&post)
 }
 
 // Não criei o delete no mysql nem no firestore então será apenas de exemplo
 func cleanUp(post *tipos.Post) {
-	postRepo.Delete(ID)
+	postRepositorio.Delete(ID)
 }
 
 /*

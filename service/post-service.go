@@ -13,16 +13,17 @@ type PostService interface {
 	Criar(post *tipos.Post) (*tipos.Post, error) //Para criar dados
 	AcharTodos() ([]tipos.Post, error)           //Para buscar dados previamente cadastrados
 	Delete(ID int64) error
+	GetBookByID(ID int64) (*tipos.Post, error)
 }
 
-type service struct{}
-
-var (
-	repos repo.PostRepositorio
-)
+type service struct {
+	repositorio repo.PostRepositorio
+}
 
 func NewPostService(repo repo.PostRepositorio) PostService {
-	return &service{}
+	return &service{
+		repositorio: repo,
+	}
 }
 
 // Fazendo a validação dos dados digitados
@@ -45,16 +46,20 @@ func (*service) Validacao(post *tipos.Post) error {
 }
 
 // Função para criar
-func (*service) Criar(post *tipos.Post) (*tipos.Post, error) {
+func (s *service) Criar(post *tipos.Post) (*tipos.Post, error) {
 	post.ID = rand.Int63()
-	return repo.NewFirestoreRepo().Save(post)
+	return s.repositorio.Save(post)
 }
 
 // Função para encontrar
-func (*service) AcharTodos() ([]tipos.Post, error) {
-	return repo.NewFirestoreRepo().Encontrados()
+func (s *service) AcharTodos() ([]tipos.Post, error) {
+	return s.repositorio.Encontrados()
 }
 
-func (*service) Delete(ID int64) error {
-	return repo.NewFirestoreRepo().Delete(ID)
+func (s *service) Delete(ID int64) error {
+	return s.repositorio.Delete(ID)
+}
+
+func (s *service) GetBookByID(ID int64) (*tipos.Post, error) {
+	return s.repositorio.GetBookByID(ID)
 }

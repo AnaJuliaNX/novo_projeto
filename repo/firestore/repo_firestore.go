@@ -6,13 +6,15 @@ import (
 	"strconv"
 
 	"cloud.google.com/go/firestore"
+	"github.com/AnaJuliaNX/novo_projeto/repo"
 	"github.com/AnaJuliaNX/novo_projeto/tipos"
 )
 
-type repos struct{}
+type reposi struct{}
 
-func NewFirestoreRepo() PostRepositorio {
-	return &repo{}
+// Comandos de save, show e delete usando o banco firestore
+func NewFirestoreRepo() repo.PostRepositorio {
+	return &reposi{}
 }
 
 const (
@@ -21,7 +23,7 @@ const (
 )
 
 // Função para adicionar/salvar um novo livro
-func (r *repo) Save(post *tipos.Post) (*tipos.Post, error) {
+func (r *reposi) Save(post *tipos.Post) (*tipos.Post, error) {
 	//Para adicionar um novo livro primeiro faz igual o "statement Prepare"
 	ctx := context.Background()
 	livro, erro := firestore.NewClient(ctx, IdDoProjeto)
@@ -47,7 +49,7 @@ func (r *repo) Save(post *tipos.Post) (*tipos.Post, error) {
 }
 
 // Função para exibir todos os livros cadastrados
-func (r *repo) Encontrados() ([]tipos.Post, error) {
+func (r *reposi) Encontrados() ([]tipos.Post, error) {
 	ctx := context.Background()
 	livro, erro := firestore.NewClient(ctx, IdDoProjeto)
 	if erro != nil {
@@ -74,7 +76,8 @@ func (r *repo) Encontrados() ([]tipos.Post, error) {
 	}
 }
 
-func (r *repo) Delete(ID int64) error {
+// Função para deletar usando o firestore
+func (r *reposi) Delete(ID int64) error {
 	ctx := context.Background()
 
 	// Inicializando o cliente no firestore
@@ -96,4 +99,9 @@ func (r *repo) Delete(ID int64) error {
 	}
 	//Se deu tudo certo não retorno nada
 	return nil
+}
+
+// Não fiz uma função para buscar o livro com o banco firestore, ta aqui só pra ele não reclamar
+func (r *reposi) GetBookByID(ID int64) (*tipos.Post, error) {
+	return &tipos.Post{}, nil
 }

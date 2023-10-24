@@ -4,16 +4,19 @@ import (
 	"fmt"
 	"net/http"
 
+	bancomysql "github.com/AnaJuliaNX/novo_projeto/banco/mysql"
 	"github.com/AnaJuliaNX/novo_projeto/cache"
 	"github.com/AnaJuliaNX/novo_projeto/controller"
 	router "github.com/AnaJuliaNX/novo_projeto/controller/http"
 	repo "github.com/AnaJuliaNX/novo_projeto/repo"
+	repomysql "github.com/AnaJuliaNX/novo_projeto/repo/mysql"
 	"github.com/AnaJuliaNX/novo_projeto/service"
 )
 
 // Desse jeito estaremos:
 var (
-	postRepositorio repo.PostRepositorio = repo.NewMysqlRepo()
+	//Criado para fazer a conexão com o banco
+	postRepositorio repo.PostRepositorio = repomysql.NewMysqlRepo(&bancomysql.DB{})
 	//Independetes de estruturas
 	postService service.PostService = service.NewPostService(postRepositorio)
 	//Primeiro valor é a porta, segundo é o banco e o terceiro é quantos segundos ficará disponivel
@@ -39,10 +42,10 @@ func main() {
 	httpRouter.POST("/postados", postController.AddBooks) //rota para adicionar os livros
 
 	//ROTAS MYSQL
-	httpRouter.POST("/livros", repo.AddBook) //rota para adicionar livros no MYSQL
-	httpRouter.GET("/livros", repo.GetAllBooks)
-	httpRouter.GET("/livros{id}", repo.GetBookByID)
-	httpRouter.DELETE("/livros/{id}", repo.Delete)
+	httpRouter.POST("/livros", postController.AddBooks) //rota para adicionar livros no MYSQL
+	httpRouter.GET("/livros", postController.GetAllBooks)
+	httpRouter.GET("/livros/{id}", postController.GetPostByID)
+	httpRouter.DELETE("/livros/{id}", postController.Delete)
 
 	//httpRouter.SERVE(os.Getenv("PORTA"))
 	httpRouter.SERVE(port)

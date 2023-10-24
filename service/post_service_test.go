@@ -30,7 +30,7 @@ func (mock *MockRepositorio) Delete(ID int64) error {
 	return nil
 }
 
-func (mock *MockRepositorio) EncontrarPeloID(ID int64) (*tipos.Post, error) {
+func (mock *MockRepositorio) GetBookByID(ID int64) (*tipos.Post, error) {
 	_, erro := fmt.Println("Apenas para não deixar vazio")
 	return nil, erro
 }
