@@ -52,7 +52,7 @@ func (r *repositorio) Encontrados() ([]tipos.Post, error) {
 	lines, erro := db.Query("select id,titulo, autor from livros_postadas")
 	if erro != nil {
 		fmt.Println(erro)
-		return []tipos.Post{}, errors.New(fmt.Sprintf("Erro ao obter o ID %v", erro))
+		return []tipos.Post{}, errors.New(fmt.Sprintf("Erro ao obter os dados %v", erro))
 	}
 	defer lines.Close()
 
@@ -63,7 +63,7 @@ func (r *repositorio) Encontrados() ([]tipos.Post, error) {
 		//O "Scan" escaneia a linha atual e busca por todo os dados solicitados
 		erro := lines.Scan(&livro.ID, &livro.Titulo, &livro.Autor)
 		if erro != nil {
-			return []tipos.Post{}, errors.New(fmt.Sprintf("Erro ao obter o ID %v", erro))
+			return []tipos.Post{}, errors.New(fmt.Sprintf("Erro ao escanear os dados %v", erro))
 		}
 		livros = append(livros, livro)
 	}
@@ -77,14 +77,14 @@ func (r *repositorio) Delete(ID int64) error {
 	statement, erro := db.Prepare("delete from livros_postadas where id = ?")
 	if erro != nil {
 		fmt.Println(erro)
-		return errors.New(fmt.Sprintf("Erro ao obter o ID %v", erro))
+		return errors.New(fmt.Sprintf("Erro ao preparar para executar %v", erro))
 	}
 	defer statement.Close()
 	//Executo o statement e excluo o livro
 	_, erro = statement.Exec(ID)
 	if erro != nil {
 		fmt.Println(erro)
-		return errors.New(fmt.Sprintf("Erro ao obter o ID %v", erro))
+		return errors.New(fmt.Sprintf("Erro ao deletar o livro %v", erro))
 	}
 	return nil
 }
